@@ -1,0 +1,94 @@
+<!doctype html>
+<link rel="stylesheet" type="text/css" href="style.css">
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {%load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style1.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   
+    <link rel="icon" type="image" href="{% static 'images/icon.png' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Store Reviews</title>
+</head>
+
+<body>
+    <nav class="header">
+        <div class="logo-container">
+            <img src="{% static 'images/iconWomen.jpg' %}" class="logo-img">
+            <a class="logo-text" href="{% url 'vendor:index' %}">Vendors website</a>
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'stores:new' %}" class="nav-link">Add store</a>
+            <a href="{% url 'my_store:index' %}" class="nav-link">My store</a>
+            <a href="{% url 'vendor:reviewInbox' %}" class="nav-link">Reviews</a>
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'vendor:logout' %}" method="post">{% csrf_token%}
+                <button type="submit" value="Logout" class="btn btn-login bg-red-500 hover:bg-red-700 transition duration-300 ease-in-out "> Logout</button>
+            </form>
+            {% else %}
+            <a href="{% url 'vendor:signup' %}" class="btn btn-signup">Sign up</a>
+            <a href="{% url 'vendor:login' %}" class="btn btn-login">Log in</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="mt-6 px-6 py-12 bg-indigo-100 rounded-xl">
+        <h2 class="mb-8 text-3xl text-center">Store reviews</h2>
+    
+        <div class="space-y-8">
+            {% for review in reviews %}
+           
+                <div class="flex bg-gray-100 rounded-xl items-center space-x-6 shadow-lg ">
+                    <div class="flex-shrink-0 w-1/5">
+                        <img src="{{ review.stores.image1.url }}" class=" w-full h-64 object-cover rounded-xl" alt="Store Image">
+                    </div>
+    
+                    <div class="w-2/3">
+                        {% for participant in review.participants.all %}
+                            {% if participant != request.user %}
+                                <h2 class="mb-2 text-3xl"><b> | {{ participant.username }}'s store review</b></h2>
+                            {% endif %}
+                        {% endfor %}
+    
+                        {% for text in review.texts.all %}
+                        <div class="p-4 bg-gray-300 rounded-xl mb-4 hover:shadow-lg transition duration-300">
+                            <p class="mb-2 text-xl"><strong> {{ text.created_by.username }}</strong> @ {{ text.created_at }}</p>
+                            <p>{{ text.content }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+         
+            {% endfor %}
+        </div>
+    </div>
+    
+
+    
+
+
+
+    <footer class="footer1">
+        <div class="footer-about">
+            <h3 class="footer-title">About</h3>
+            <p class="footer-text">Vendor promotional website</p>
+        </div>
+
+        <div class="footer-menu">
+            <h3 class="footer-title">Menu</h3>
+            <ul class="footer-links">
+                <li><a href="/" class="footer-link">About</a></li>
+                <li><a href="/" class="footer-link">Contact</a></li>
+                <li><a href="/" class="footer-link">Privacy</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <button id="backToTopBtn" class="back-to-top-btn">↑ Back to Top</button>
+
+</body>
+
+</html>

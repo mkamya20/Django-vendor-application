@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style1.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image" href="{% static 'images/icon.png' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+        $(document).ready(function () {
+            // Search for stores by name
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#store-container .store").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // Show "Back to Top" button
+            var btn = $('#backToTopBtn');
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > 300) {
+                    btn.addClass('flex');
+                    btn.removeClass('hidden');
+                } else {
+                    btn.addClass('hidden');
+                    btn.removeClass('flex');
+                }
+            });
+
+            btn.on('click', function (e) {
+                e.preventDefault();
+                $('html, body').animate({ scrollTop: 0 }, '300');
+            });
+        });
+    </script>
+    <title>Welcome | Vendors</title>
+</head>
+
+<body class="bg-gray-50">
+    <nav class="header">
+        <div class="logo-container">
+            <img src="{% static 'images/iconWomen.jpg' %}" class="logo-img">
+            <a class="logo-text" href="{% url 'vendor:index' %}">Vendors website</a>
+        </div>
+        <div class="nav-links">
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'stores:new' %}" class="nav-link">Add store</a>
+            <a href="{% url 'my_store:index' %}" class="nav-link">My store</a>
+            <a href="{% url 'vendor:reviewInbox' %}" class="nav-link">Reviews</a>
+            <form action="{% url 'vendor:logout' %}" method="post">{% csrf_token%}
+                <button type="submit" value="Logout" class="btn btn-login bg-red-500 hover:bg-red-700 transition duration-300 ease-in-out "> <i class="fas fa-user-circle mr-2"></i> Logout</button>
+            </form>
+            {% else %}
+            <a href="{% url 'vendor:signup' %}" class="btn btn-signup">Sign up</a>
+            <a href="{% url 'vendor:login' %}" class="btn btn-login">Log in</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="promo-section">
+        <div class="promo-text-container">
+            <p class="promo-text">LET'S EXPLORE</p>
+            <div id="yellow">LOCAL</div>
+            <p class="promo-text">SERVICES</p>
+            <p class="promo-text-small">Discover and Sell local services</p>
+        </div>
+        <img src="{% static 'images/woman.png' %}" class="promo-img">
+
+    </div>
+    <div class="search-bar">
+        <input id="searchInput" type="text" placeholder="Type store name to search for it..." class="search-input">
+    </div>
+
+    <div class="main-content">
+        <div class="stores-section">
+            <h1 class="section-title"><b>Vendors</b></h1>
+
+            <div id="store-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 flex justify-center items-center flex-wrap">
+                {% for store in stores %}
+                <div class="store max-w-xs bg-white shadow-lg rounded-lg overflow-hidden m-4 transition duration-300 ease-in-out transform hover:scale-105">
+                    <a href="{% url 'stores:detail' store.id %}">
+                        <div class="relative">
+                            <img src="{{store.image.url}}" class="w-full h-64 object-cover rounded-t-xl">
+                            <div class="absolute bottom-0 left-0 p-4 text-white bg-black bg-opacity-45 w-full">
+                                <h2 class="text-xl font-bold">{{store.name}} Store</h2>
+                                <p class="text-sm">
+                                    Owner:
+                                    {% if request.user == store.created_by %}
+                                    you
+                                    {% else %}
+                                    <b>{{store.created_by.username}}</b>
+                                    {% endif %}
+                                    on {{store.created_at|date:"F d, Y"}}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            
+        </div>
+
+        <div class="sections">
+            <h2 class="section-title">Sections</h2>
+
+            <div class="categories-container">
+                {% for category in categories %}
+                <div class="category">
+                    <a href="#">
+                        <div class="category-details">
+                            <h2 class="category-title">{{category.name}}🛒</h2>
+                            <p class="category-text">There are {{category.stores.count}} stores in this section. </p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer1">
+        <div class="footer-about">
+            <h3 class="footer-title">About</h3>
+            <p class="footer-text">Vendor promotional website</p>
+        </div>
+
+        <div class="footer-menu">
+            <h3 class="footer-title">Menu</h3>
+            <ul class="footer-links">
+                <li><a href="/" class="footer-link">About</a></li>
+                <li><a href="/" class="footer-link">Contact</a></li>
+                <li><a href="/" class="footer-link">Privacy</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTopBtn" class="back-to-top-btn">↑ Back to Top</button>
+</body>
+
+</html>
